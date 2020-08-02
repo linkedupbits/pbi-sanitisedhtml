@@ -34,40 +34,120 @@ import IVisual = powerbi.extensibility.visual.IVisual;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
 import DataView = powerbi.DataView;
+import IVisualEventService = powerbi.extensibility.IVisualEventService;
 import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject;
 
 import { VisualSettings } from "./settings";
+import { AcceptRiskSettings } from "./settings";
+import { HtmlSettings } from "./settings";
+import { json } from "d3";
+import { getValue } from "powerbi-visuals-utils-dataviewutils/lib/dataViewObjects";
+//import createPurify from "dompurify";
+import * as dompurify from "dompurify";
+
 export class Visual implements IVisual {
     private target: HTMLElement;
-    private updateCount: number;
+    private events: IVisualEventService;
+
+    private acceptRiskHtmlText: Text;
+    private acceptRiskHtml: HTMLElement;
+    private htmlTarget: HTMLElement;
+    //private updateCount: number;
     private settings: VisualSettings;
-    private textNode: Text;
+    private acceptRiskSettings: AcceptRiskSettings;
+    //private textNode: Text;
+    //private viewJson: HTMLElement;
+    private acceptRisk: boolean = true;
 
     constructor(options: VisualConstructorOptions) {
         console.log('Visual constructor', options);
+
+        this.acceptRisk = true;
+
         this.target = options.element;
-        this.updateCount = 0;
+        this.events = options.host.eventService;
+
+        this.acceptRiskSettings = new AcceptRiskSettings();
+        this.acceptRiskSettings.htmlSettings = new HtmlSettings();
+        this.acceptRiskSettings.htmlSettings.htmlRiskProperty = false;
+
+
+
         if (document) {
-            const new_p: HTMLElement = document.createElement("p");
-            new_p.appendChild(document.createTextNode("Update count:"));
-            const new_em: HTMLElement = document.createElement("em");
-            this.textNode = document.createTextNode(this.updateCount.toString());
-            new_em.appendChild(this.textNode);
-            new_p.appendChild(new_em);
-            this.target.appendChild(new_p);
+            this.acceptRiskHtml = document.createElement("div");
+            //this.acceptRiskHtml.innerText = "ACCEPT THE HTML RISK";
+            this.acceptRiskHtmlText = document.createTextNode("YOU NEED TO ACCEPT THE HTML RISK IN FORMAT SETTINGS");
+            this.acceptRiskHtml.appendChild(this.acceptRiskHtmlText);
+            this.target.appendChild(this.acceptRiskHtml);
+
+            this.htmlTarget = document.createElement("div");
+            this.target.appendChild(this.htmlTarget);
+            this.htmlTarget.className = "aci-html-wrapper";
         }
     }
 
     public update(options: VisualUpdateOptions) {
+        this.events.renderingStarted(options);
+
         this.settings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
-        console.log('Visual update', options);
-        if (this.textNode) {
-            this.textNode.textContent = (this.updateCount++).toString();
+        //this.acceptRiskSettings = Visual.parseAcceptRisk(options && options.dataViews && options.dataViews[0]);
+        this.acceptRiskSettings = AcceptRiskSettings.parse<AcceptRiskSettings>(options.dataViews[0]);
+        if (this.acceptRiskSettings.htmlSettings.htmlRiskProperty) {
+            this.acceptRiskHtml.style.display = "none";
+            this.htmlTarget.style.display = "";
+        } else {
+            this.acceptRiskHtml.style.display = "";
+            this.htmlTarget.style.display = "none";
         }
+
+        //if (options.dataViews[0].metadata.objects) {
+        //    getValue(options.dataViews[0].metadata.objects,"htmlSettings","")
+        //}
+
+        //this.acceptRisk = !this.acceptRisk;//this.acceptRiskSettings.htmlSettings.htmlRiskProperty;
+
+
+
+
+        if (this.acceptRiskHtml) {
+            //this.acceptRiskHtmlText.textContent += JSON.stringify(this.acceptRiskSettings);
+            //this.acceptRiskHtmlText.textContent += JSON.stringify(options.dataViews[0].metadata.objects);
+            if (options.dataViews && options.dataViews[0] && options.dataViews[0].metadata.objects && options.dataViews[0].metadata.objects["acceptHtmlRisk"]) {
+                //this.acceptRisk = options.dataViews[0].metadata.objects["acceptHtmlRisk"].$instances[0]
+                //this.acceptRisk.toString();
+            }
+        }
+
+        console.log('Visual update', options);
+        if (this.htmlTarget) {
+            try {
+                const dataView: DataView = options
+                    && options.dataViews
+                    && options.dataViews[0];
+                const HTMLString = dataView.single.value.toString();
+                if (typeof this.htmlTarget !== "undefined") {
+                    try {
+                        //const purify = createPurify()
+                        this.htmlTarget.innerText = dompurify.sanitize(HTMLString);
+                    } catch (ex1) {
+                        this.htmlTarget.innerHTML = "<div>" + JSON.stringify((<Error>ex1).message) + "</div>"; 
+                    }
+                }
+            }
+            catch (exception) {
+
+            }
+        }
+        this.events.renderingFinished(options);
     }
+
+
 
     private static parseSettings(dataView: DataView): VisualSettings {
         return <VisualSettings>VisualSettings.parse(dataView);
+    }
+    private static parseAcceptRisk(dataView: DataView): AcceptRiskSettings {
+        return <AcceptRiskSettings>AcceptRiskSettings.parse(dataView);
     }
 
     /**
@@ -76,6 +156,31 @@ export class Visual implements IVisual {
      *
      */
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
-        return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
+        //return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
+
+
+        let objectName: string = options.objectName;
+        let objectEnumeration: VisualObjectInstance[] = [];
+
+        switch (objectName) {
+            case 'htmlSettings':
+                //const viObj: VisualObjectInstance = new VisualObjectInstance();
+                objectEnumeration.push({
+                    objectName: objectName,
+                    displayName: "pushed displayName",
+                    properties: {
+                        htmlRiskProperty: this.acceptRiskSettings.htmlSettings.htmlRiskProperty
+                    },
+                    selector: null
+                });
+                break;
+        };
+
+
+
+        return objectEnumeration;
+
     }
+
+
 }

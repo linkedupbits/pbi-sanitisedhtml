@@ -1,84 +1,36 @@
 {
-    "dataRoles": [
-        {
-            "displayName": "Category Data",
-            "name": "category",
-            "kind": "Grouping"
-        },
-        {
-            "displayName": "Measure Data",
-            "name": "measure",
-            "kind": "Measure"
+  "dataRoles": [
+    {
+      "displayName": "Html Source",
+      "name": "category",
+      "kind": "Measure",
+      "description": "A field that contains html or text. This is NOT sanitised or made safe. Check your input!",
+      "requiredTypes": [ { "text": true } ]
+    }
+  ],
+  "objects": {
+    "htmlSettings": {
+      "displayName": "Accept HTML Risk",
+      "properties": {
+        "htmlRiskProperty": {
+          "displayName": "Accept Html Risk Property",
+          "displayNameKey": "Accept_Html_Risk",
+          "type": { "bool": true }
         }
-    ],
-    "objects": {
-        "dataPoint": {
-            "displayName": "Data colors",
-            "properties": {
-                "defaultColor": {
-                    "displayName": "Default color",
-                    "type": {
-                        "fill": {
-                            "solid": {
-                                "color": true
-                            }
-                        }
-                    }
-                },
-                "showAllDataPoints": {
-                    "displayName": "Show all",
-                    "type": {
-                        "bool": true
-                    }
-                },
-                "fill": {
-                    "displayName": "Fill",
-                    "type": {
-                        "fill": {
-                            "solid": {
-                                "color": true
-                            }
-                        }
-                    }
-                },
-                "fillRule": {
-                    "displayName": "Color saturation",
-                    "type": {
-                        "fill": {}
-                    }
-                },
-                 "fontSize": {
-                    "displayName": "Text Size",
-                    "type": {
-                        "formatting": {
-                            "fontSize": true
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "dataViewMappings": [
+
+      }
+    }
+  },
+  "dataViewMappings": [
+    {
+      "conditions": [
         {
-            "categorical": {
-                "categories": {
-                    "for": {
-                        "in": "category"
-                    },
-                    "dataReductionAlgorithm": {
-                        "top": {}
-                    }
-                },
-                "values": {
-                    "select": [
-                        {
-                            "bind": {
-                                "to": "measure"
-                            }
-                        }
-                    ]
-                }
-            }
+          "measure": { "max": 1 }
         }
-    ]
+      ],
+      "single": { "role": "measure" }
+    }
+  ],
+  "suppressDefaultTitle": true,
+  "advancedEditModeSupport": 1
 }

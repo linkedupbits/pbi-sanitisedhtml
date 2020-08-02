@@ -1,1 +1,23 @@
-{"visual":{"name":"vanilla","displayName":"vanilla","guid":"vanilla8CE429FB1A474149B346A92E41AFEFC7","visualClassName":"Visual","version":"1.0.0","description":"","supportUrl":"","gitHubUrl":""},"apiVersion":"2.6.0","author":{"name":"","email":""},"assets":{"icon":"assets/icon.png"},"externalJS":null,"style":"style/visual.less","capabilities":"capabilities.json","dependencies":null,"stringResources":[]}
+{
+  "visual": {
+    "name": "sanitisedHTML",
+    "displayName": "Sanitised HTML Display",
+    "guid": "sanitisedHTML04AF8EA0B2F549F699F70C6F532136F3",
+    "visualClassName": "Visual",
+    "version": "1.0.0",
+    "description": "Sanitised HTML Visualisation",
+    "supportUrl": "https://github.com/linkedupbits/pbi-sanitisedhtml",
+    "gitHubUrl": "https://github.com/linkedupbits/pbi-sanitisedhtml"
+  },
+  "apiVersion": "2.6.0",
+  "author": {
+    "name": "Stephen Cox",
+    "email": "scox.nz@icloud.com"
+  },
+  "assets": { "icon": "assets/icon.png" },
+  "externalJS": null,
+  "style": "style/visual.less",
+  "capabilities": "capabilities.json",
+  "dependencies": null,
+  "stringResources": []
+}
