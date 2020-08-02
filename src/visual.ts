@@ -128,7 +128,8 @@ export class Visual implements IVisual {
                 if (typeof this.htmlTarget !== "undefined") {
                     try {
                         //const purify = createPurify()
-                        this.htmlTarget.innerText = dompurify.sanitize(HTMLString);
+                        //this.htmlTarget.innerText = dompurify.sanitize(HTMLString);
+                        this.htmlTarget.innerHTML = dompurify.sanitize(HTMLString);
                     } catch (ex1) {
                         this.htmlTarget.innerHTML = "<div>" + JSON.stringify((<Error>ex1).message) + "</div>"; 
                     }
