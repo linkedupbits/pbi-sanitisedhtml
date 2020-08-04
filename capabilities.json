@@ -25,7 +25,7 @@
     {
       "conditions": [
         {
-          "measure": { "max": 1 }
+          "category": { "max": 1 }
         }
       ],
       "single": { "role": "measure" }
