@@ -120,16 +120,23 @@ export class Visual implements IVisual {
 
         console.log('Visual update', options);
         if (this.htmlTarget) {
-            try {
+            try {                
                 const dataView: DataView = options
                     && options.dataViews
                     && options.dataViews[0];
                 const HTMLString = dataView.single.value.toString();
                 if (typeof this.htmlTarget !== "undefined") {
                     try {
-                        //const purify = createPurify()
+                        while (this.htmlTarget.firstChild) {
+                            this.htmlTarget.firstChild.remove();
+                        }
                         //this.htmlTarget.innerText = dompurify.sanitize(HTMLString);
-                        this.htmlTarget.innerHTML = dompurify.sanitize(HTMLString);
+                        //this.htmlTarget.innerHTML = dompurify.sanitize(HTMLString);
+                        if (this.acceptRisk) {
+                            const purifiedHtml = dompurify.sanitize(HTMLString);
+                            const fragment = document.createRange().createContextualFragment(purifiedHtml);
+                            this.htmlTarget.appendChild(fragment);
+                        }
                     } catch (ex1) {
                         this.htmlTarget.innerHTML = "<div>" + JSON.stringify((<Error>ex1).message) + "</div>"; 
                     }
